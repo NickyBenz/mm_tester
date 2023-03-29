@@ -16,4 +16,4 @@ class ASQuoter(base_quoter.BaseQuoter):
         return self.compute(mid_price, levels, spread)
         
     def compute(self, levels: int, mid_price: float, spread: float)-> Tuple(List(order.Order), List(order.Order)):
-        return ([][])
+        return ([], [])
