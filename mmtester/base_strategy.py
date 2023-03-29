@@ -13,7 +13,7 @@ class BaseStrategy(ABC):
     
        
     @abstractmethod
-    def on_tick(self, data):
+    def on_tick(self, record):
         pass
     
         

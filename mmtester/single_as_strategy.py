@@ -1,9 +1,10 @@
 from . import base_strategy, mm_enums, exchange, order, position
 
 class SingleASstrategy(base_strategy.BaseStrategy):
-    def __init__(self, balance, instrument):
-        super().__init__(balance)
-        self.instrument = instrument
+    def __init__(self, name, balance, instrument, total_time):
+        super().__init__(name)
+        self.total_time = total_time
+        self.position = position.Position(balance, instrument)
 
 
     def on_cancel(self, order):
@@ -18,5 +19,5 @@ class SingleASstrategy(base_strategy.BaseStrategy):
         return super().on_fill(order, state)
     
     
-    def on_tick(self, data):
-        return super().on_tick(data)
+    def on_tick(self, record):
+        self.position.record(record)

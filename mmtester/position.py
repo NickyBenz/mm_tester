@@ -44,7 +44,8 @@ class Position:
         self.balance += pnl
     
     
-    def record(self, timestamp, price):
-        self.stat.record(timestamp, price, self.balance, self.total_qty, self.avg_price, self.fees, self.trade_num, self.trade_qty)
+    def record(self, record):
+        price = record.get_instrument_data(self.instrument, "mid")
+        self.stat.record(record.timestamp, price, self.balance, self.total_qty, self.avg_price, self.fees, self.trade_num, self.trade_qty)
     
     
