@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# sample documentation build configuration file, created by
+# mm_tester documentation build configuration file, created by
 # sphinx-quickstart on Mon Apr 16 21:22:43 2012.
 #
 # This file is execfile()d with the current directory set to its containing dir.
@@ -164,7 +164,7 @@ html_static_path = ['_static']
 #html_file_suffix = None
 
 # Output file base name for HTML help builder.
-htmlhelp_basename = 'sampledoc'
+htmlhelp_basename = 'mm_testerdoc'
 
 
 # -- Options for LaTeX output --------------------------------------------------
@@ -183,8 +183,8 @@ latex_elements = {
 # Grouping the document tree into LaTeX files. List of tuples
 # (source start file, target name, title, author, documentclass [howto/manual]).
 latex_documents = [
-  ('index', 'sample.tex', u'sample Documentation',
-   u'Kenneth Reitz', 'manual'),
+  ('index', 'mm_tester.tex', u'MM Testing Documentation',
+   u'Pravin Bezwada', 'manual'),
 ]
 
 # The name of an image file (relative to this directory) to place at the top of
