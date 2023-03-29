@@ -31,7 +31,7 @@ class SingleMMStrategy(base_strategy.BaseStrategy):
     def on_tick(self, record: record.Record):
         if record.counter > 0 and record.counter  % self.frequency == 0 and self.requote:
             self.exchange.cancel_all(record.timestamp, self)
-            (bids, asks) = self.quoter.quote(self.levels, record.get_instrument_data(self.instrument, "mid"))
+            (bids, asks) = self.quoter.quote(record.timestamp, self, self.levels, record.get_instrument_data(self.instrument, "mid"))
             self.exchange.add_quotes(bids, asks)
             self.requote = False
         self.position.record(record)
