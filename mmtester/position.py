@@ -1,6 +1,6 @@
 import numpy as np
 from . import mm_enums
-from . import order
+from . import stat
 
 
 class Position:
@@ -9,11 +9,11 @@ class Position:
         self.balance = balance
         self.instrument = instrument
         self.total_qty = 0
-        self.pnl = 0
         self.fees = 0
         self.trade_num = 0
         self.trade_qty = 0
         self.avg_price = 0
+        self.stat = stat.Stat(instrument)
     
     
     def on_fill(self, order, fill_type):
@@ -45,6 +45,6 @@ class Position:
     
     
     def record(self, timestamp, price):
-        pass
+        self.stat.record(timestamp, price, self.balance, self.total_qty, self.avg_price, self.fees, self.trade_num, self.trade_qty)
     
     

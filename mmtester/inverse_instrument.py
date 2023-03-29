@@ -14,6 +14,10 @@ class InverseInstrument(base_instrument.BaseInstrument):
         return qty * (1.0 - entry_price / exit_price)
     
     
+    def equity(self, mid, balance, position, avg_price):
+        return super().equity(mid, balance, position, avg_price)
+    
+    
     def fees(self, qty, fill_type):
         return super().fees(qty, fill_type)
     

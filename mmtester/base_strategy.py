@@ -2,18 +2,14 @@ from abc import ABC, abstractmethod
 from . import mm_enums
 
 class BaseStrategy(ABC):
-    def __init__(self, balance):
-        self.equity = 0
-        self.pnl = 0
-        self.fees = 0
-        self.initial_balance = balance
-        self.balance = balance
-        self.positions = {}
+    def __init__(self, name):
+        self.name = name
+        self.exchange = None
     
     
     @abstractmethod
-    def on_exchange_init(self):
-        pass
+    def on_exchange_init(self, exchange):
+        self.exchange = exchange
     
        
     @abstractmethod

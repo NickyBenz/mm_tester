@@ -13,6 +13,11 @@ class BaseInstrument:
     def name(self):
         return self.symbol
     
+    
+    @abstractmethod
+    def equity(self, mid, balance, position, avg_price):
+        return balance + self.pnl(position, avg_price, mid)
+        
         
     @abstractmethod
     def get_qty_from_notional(self, price, notional):

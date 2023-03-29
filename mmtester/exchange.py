@@ -21,7 +21,7 @@ class Exchange:
         self.cancels = {}
         
         for strategy in self.strategies.values():
-            strategy.on_exchange_init() 
+            strategy.on_exchange_init(self) 
     
     
     def close_all(self):
