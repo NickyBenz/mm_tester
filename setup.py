@@ -12,13 +12,13 @@ with open('LICENSE') as f:
     license = f.read()
 
 setup(
-    name='sample',
+    name='mm_tester',
     version='0.1.0',
-    description='Sample package for Python-Guide.org',
+    description='Backtesting software for market making',
     long_description=readme,
-    author='Kenneth Reitz',
-    author_email='me@kennethreitz.com',
-    url='https://github.com/kennethreitz/samplemod',
+    author='Pravin Bezwada',
+    author_email='pravin.bezwada@gmail.com.com',
+    url='https://github.com/satyapravin/mm_tester',
     license=license,
     packages=find_packages(exclude=('tests', 'docs'))
 )
