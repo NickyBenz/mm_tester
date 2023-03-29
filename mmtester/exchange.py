@@ -1,24 +1,25 @@
 import math
 import numpy as np
 import pandas as pd
-from . import mm_enums, data
+from typing import List, Set, Dict
+from . import mm_enums, data, base_strategy, order, record
 
 class Exchange:
-    def __init__(self, market_data_latency, order_fill_latency):
-        self.curr_step = 0
-        self.market_data_latency = market_data_latency
-        self.order_fill_latency = order_fill_latency
-        self.strategies = set()
+    def __init__(self, market_data_latency_ms: float, order_fill_latency_ms: float):
+        self.curr_step: int = 0
+        self.market_data_latency: float = market_data_latency_ms
+        self.order_fill_latency: float = order_fill_latency_ms
+        self.strategies: Set(base_strategy.BaseStrategy) = set()
 
     
-    def start(self, data):
-        self.data = data
-        self.sample_frequency = data.frequency
-        self.market_latency_steps = int(math.ceil(self.market_data_latency / self.sample_frequency))
+    def start(self, dataObject: data.Data):
+        self.dataObject: data.Data = dataObject
+        self.sample_frequency: float = dataObject.frequency
+        self.market_latency_steps: int = int(math.ceil(self.market_dataObject_latency / self.sample_frequency))
         self.curr_step = 0
-        self.max_step = data.get_rows() - 1
-        self.orders = []
-        self.cancels = {}
+        self.max_step: int = dataObject.get_rows() - 1
+        self.orders: List(order.Order) = []
+        self.cancels: Dict(order.Order, pd.DatetimeIndex) = {}
         
         for strategy in self.strategies:
             strategy.on_exchange_init(self) 
@@ -32,12 +33,12 @@ class Exchange:
         self.orders.clear()
         
     
-    def cancel_order(self, timestamp, order):
+    def cancel_order(self, timestamp: pd.DatetimeIndex, order: order.Order):
         if order.state == mm_enums.OrderState.NEW:
             self.cancels[order] = timestamp
         
         
-    def cancel_all(self, timestamp, strategy):
+    def cancel_all(self, timestamp: pd.DatetimeIndex, strategy: base_strategy.BaseStrategy):
         for order in self.orders[:]:
             if order.strategy == strategy:
                 self.cancels[order] = timestamp
@@ -47,7 +48,7 @@ class Exchange:
         cancelled = []
         
         for order in self.cancels:
-            if self.cancels[order] + self.market_data_latency >= self.df.index[self.curr_step]:
+            if self.cancels[order] + self.market_dataObject_latency >= self.df.index[self.curr_step]:
                 if order.state != mm_enums.OrderState.FILLED:
                     order.state = mm_enums.OrderState.CANCELED
                     self.orders.remove(order)
@@ -58,26 +59,34 @@ class Exchange:
         for order in cancelled:
             del self.cancels[order]
             
-                
-    def add_order(self, order):
+            
+    def add_quotes(self, bids: List(order), asks: List(order)):
+        assert(len(bids) == len(asks))
+        
+        for i in range(len(bids)):
+            self.add_order(bids[i])
+            self.add_order(asks[i])
+        
+        
+    def add_order(self, order: order.Order):
         assert(order.state == mm_enums.OrderState.NEW)
         self.orders.append(order)
     
     
-    def register(self, strategy):
+    def register(self, strategy: base_strategy.BaseStrategy):
         self.strategies.add(strategy)
         
     
-    def get_data(self):
+    def get_record(self) -> record.Record:
         if self.curr_step < self.market_latency_steps:
             return None
         
         step = self.curr_step - self.market_latency_steps
-        return self.data.get_record(step)
+        return self.dataObject.get_record(step)
 
 
     def fill_orders(self):    
-        record = self.data.get_record(self.curr_step)
+        record = self.dataObject.get_record(self.curr_step)
         
         for order in self.orders[:]:
             assert(order.state == mm_enums.OrderState.NEW)
@@ -95,7 +104,7 @@ class Exchange:
                     self.orders.remove(order)
         
         
-    def step(self):
+    def step(self) -> bool:
         if self.curr_step >= self.max_step:
             return False
         

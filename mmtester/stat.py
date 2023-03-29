@@ -1,22 +1,26 @@
 from matplotlib import pyplot as plt
 import pandas as pd
 import numpy as np
+from typing import List
+from datetime import datetime
+from . import base_instrument
 
 class Stat:
-    def __init__(self, instrument, unit='ms'):
-        self.intrument = instrument
-        self.unit = unit
-        self.timestamp = []
-        self.mid = []
-        self.balance = []
-        self.position = []
-        self.avg_price = []
-        self.fee = []
-        self.trade_num = []
-        self.trade_qty = []
+    def __init__(self, instrument: base_instrument.BaseInstrument, unit='ms'):
+        self.intrument: base_instrument.BaseInstrument = instrument
+        self.unit: str = unit
+        self.timestamp: List(pd.DatetimeIndex) = []
+        self.mid: List(float) = []
+        self.balance: List(float) = []
+        self.position: List(float) = []
+        self.avg_price: List(float) = []
+        self.fee: List(float) = []
+        self.trade_num: List(int) = []
+        self.trade_qty: List(float) = []
 
 
-    def record(self, timestamp, mid, balance, position, avg_price, fee, trade_num, trade_qty):
+    def record(self, timestamp: pd.DatetimeIndex, mid: float, balance: float, position: float, 
+               avg_price: float, fee: float, trade_num: int, trade_qty: float) -> None:
         self.timestamp.append(timestamp)
         self.mid.append(mid)
         self.balance.append(balance)
@@ -27,11 +31,11 @@ class Stat:
         self.trade_qty.append(trade_qty)
 
 
-    def datetime(self):
+    def datetime(self) -> datetime:
         return pd.to_datetime(np.asarray(self.timestamp), unit=self.unit)
 
 
-    def equity(self, resample=None, include_fee=True):
+    def equity(self, resample: str=None, include_fee: bool=True) -> float:
         if include_fee:
             equity = pd.Series(
                 self.instrument.equity(
@@ -60,31 +64,31 @@ class Stat:
             return equity.resample(resample).last()
 
 
-    def sharpe(self, resample, include_fee=True, trading_days=365):
+    def sharpe(self, resample: str, include_fee: bool=True, trading_days=365) -> float:
         pnl = self.equity(resample, include_fee=include_fee).diff().dropna()
         c = (24 * 3600) / (pnl.index[-1] - pnl.index[0]).total_seconds
         return pnl.mean() / pnl.std() * np.sqrt(c * trading_days)
 
 
-    def sortino(self, resample, include_fee=True, trading_days=365):
+    def sortino(self, resample: str, include_fee: bool=True, trading_days=365) -> float:
         pnl = self.equity(resample, include_fee=include_fee).diff().dropna()
         std = pnl[pnl < 0].std()
         c = (24 * 3600) / (pnl.index[-1] - pnl.index[0]).total_seconds
         return pnl.mean() / std * np.sqrt(c * trading_days)
 
 
-    def riskreturnratio(self, include_fee=True):
+    def riskreturnratio(self, include_fee=True) -> float:
         return self.annualised_return(include_fee=include_fee) / self.maxdrawdown(include_fee=include_fee)
 
 
-    def drawdown(self, resample=None, include_fee=True):
+    def drawdown(self, resample: str=None, include_fee=True) -> float:
         equity = self.equity(resample, include_fee=include_fee)
         max_equity = equity.cummax()
         drawdown = equity - max_equity
         return drawdown
 
 
-    def maxdrawdown(self, denom=None, include_fee=True):
+    def maxdrawdown(self, denom: float=None, include_fee=True) -> float:
         mdd = -self.drawdown(None, include_fee=include_fee).min()
         if denom is None:
             return mdd
@@ -92,15 +96,15 @@ class Stat:
             return mdd / denom
 
 
-    def trade_num_frequency(self, interval):
+    def trade_num_frequency(self, interval: str) -> float:
         return pd.Series(self.trade_num, index=self.datetime()).diff().rolling(interval).sum().mean()
 
 
-    def trade_volume_frequency(self, interval):
+    def trade_volume_frequency(self, interval: str) -> float:
         return pd.Series(self.trade_qty, index=self.datetime()).diff().rolling(interval).sum().mean()
 
 
-    def annualised_return(self, denom=None, include_fee=True, trading_days=365):
+    def annualised_return(self, denom: float=None, include_fee=True, trading_days=365):
         equity = self.equity(None, include_fee=include_fee)
         c = (24 * 3600) / (equity.index[-1] - equity.index[0]).total_seconds
         if denom is None:

@@ -1,22 +1,21 @@
 import numpy as np
-from . import mm_enums
-from . import stat
+from . import mm_enums, stat, base_instrument, order, record
 
 
 class Position:
-    def __init__(self, balance, instrument):
-        self.initial_balance = balance
-        self.balance = balance
-        self.instrument = instrument
-        self.total_qty = 0
-        self.fees = 0
-        self.trade_num = 0
-        self.trade_qty = 0
-        self.avg_price = 0
+    def __init__(self, balance: float, instrument: base_instrument.BaseInstrument):
+        self.initial_balance: float = balance
+        self.balance: float = balance
+        self.instrument: base_instrument.BaseInstrument = instrument
+        self.total_qty: float = 0
+        self.fees: float = 0
+        self.trade_num: int = 0
+        self.trade_qty: float = 0
+        self.avg_price: float = 0
         self.stat = stat.Stat(instrument)
     
     
-    def on_fill(self, order, fill_type):
+    def on_fill(self, order:order.Order, fill_type: mm_enums.FillType) -> None:
         assert(order.state == mm_enums.OrderState.FILLED)
         qty = order.quantity if order.side == mm_enums.Side.BUY else -order.quantity
         pnl = 0
@@ -44,7 +43,7 @@ class Position:
         self.balance += pnl
     
     
-    def record(self, record):
+    def record(self, record: record.Record) -> None:
         price = record.get_instrument_data(self.instrument, "mid")
         self.stat.record(record.timestamp, price, self.balance, self.total_qty, self.avg_price, self.fees, self.trade_num, self.trade_qty)
     
