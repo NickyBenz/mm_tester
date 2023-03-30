@@ -1,5 +1,5 @@
 from typing import List
-from pandas import pd
+import pandas as pd
 from . import record
 
 
@@ -9,8 +9,8 @@ class Data:
         self.frequency = frequency_milliseconds
         cols = self.get_columns()
         
-        self.features: List(str) = []
-        self.instr_names: List(str) = []
+        self.features: List[str] = []
+        self.instr_names: List[str] = []
         
         for col in cols:
             if "feat_" in col:
@@ -24,15 +24,15 @@ class Data:
             assert(name + "_ask" in cols)
     
     
-    def get_feature_names(self)->List(str):
+    def get_feature_names(self)-> List[str]:
         return self.features
     
     
-    def get_instrument_names(self)->List(str):
+    def get_instrument_names(self)-> List[str]:
         return self.instr_names
     
         
-    def get_columns(self)-> List(str):
+    def get_columns(self)-> List[str]:
         return list(self.df.columns)
     
     
