@@ -9,7 +9,7 @@ class Exchange:
         self.curr_step: int = 0
         self.market_data_latency: float = market_data_latency_ms
         self.order_fill_latency: float = order_fill_latency_ms
-        self.strategies: Set(base_strategy.BaseStrategy) = set()
+        self.strategies: Set[base_strategy.BaseStrategy] = set()
 
     
     def start(self, dataObject: data.Data):
@@ -18,8 +18,8 @@ class Exchange:
         self.market_latency_steps: int = int(math.ceil(self.market_dataObject_latency / self.sample_frequency))
         self.curr_step = 0
         self.max_step: int = dataObject.get_rows() - 1
-        self.orders: List(order.Order) = []
-        self.cancels: Dict(order.Order, pd.DatetimeIndex) = {}
+        self.orders: List[order.Order] = []
+        self.cancels: Dict[order.Order, pd.DatetimeIndex] = {}
         
         for strategy in self.strategies:
             strategy.on_exchange_init(self) 
@@ -68,7 +68,7 @@ class Exchange:
             del self.cancels[order]
             
             
-    def add_quotes(self, bids: List(order), asks: List(order)):
+    def add_quotes(self, bids: List[order], asks: List[order]):
         assert(len(bids) == len(asks))
         
         for i in range(len(bids)):
