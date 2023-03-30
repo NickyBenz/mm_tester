@@ -1,9 +1,9 @@
-from . import base_instrument, mm_enums
+from mmtester import base_instrument, mm_enums
 
 
 class InverseInstrument(base_instrument.BaseInstrument):
-    def __init__(self, symbol:str):
-        super().__init__(symbol)
+    def __init__(self, symbol:str, marker_fee: float, taker_fee: float):
+        super().__init__(symbol, marker_fee, taker_fee)
         
         
     def  get_qty_from_notional(self, price: float, notional: float) -> float:

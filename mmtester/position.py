@@ -1,5 +1,5 @@
 import numpy as np
-from . import mm_enums, stat, base_instrument, order, record
+from mmtester import mm_enums, stat, base_instrument, order, record
 
 
 class Position:

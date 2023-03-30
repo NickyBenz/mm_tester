@@ -1,5 +1,5 @@
 from typing import List
-from . import exchange, mm_enums, exchange, order, position, base_instrument, record, base_quoter
+from mmtester import exchange, mm_enums, exchange, order, position, base_instrument, record, base_quoter
 
 
 class SingleMMStrategy(exchange.BaseStrategy):

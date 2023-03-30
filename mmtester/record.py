@@ -1,5 +1,5 @@
 import pandas as pd
-from . import base_instrument
+from mmtester import base_instrument
 
 class Record:
     def __init__(self, counter: int, timestamp: pd.DatetimeIndex, series: pd.Series):

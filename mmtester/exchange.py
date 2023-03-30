@@ -3,7 +3,7 @@ import numpy as np
 import pandas as pd
 from abc import ABC, abstractmethod
 from typing import List, Set, Dict
-from . import mm_enums, data, exchange, order, record
+from mmtester import mm_enums, data, exchange, order, record
 
 
 class BaseStrategy(ABC):

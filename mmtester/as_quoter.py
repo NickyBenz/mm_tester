@@ -2,16 +2,16 @@ import math
 import numpy as np
 import pandas as pd
 from typing import List, Tuple
-from . import base_quoter, base_instrument, order, exchange
+from mmtester import base_quoter, base_instrument, order, exchange
 
 
 class ASQuoter(base_quoter.BaseQuoter):
     def __init__(self, instr: base_instrument.BaseInstrument, inventory: float, gamma: float, kappa: float, tau: float, 
                  volatility: float, price_skew: float, size_skew: float, 
                  tick_size: float, lot_size: float, max_quote_size: float):
-        super().__init__({"q": inventory, "gamma": gamma, "kappa": kappa,  "tau": tau, "sigma": volatility, 
-                          "price_skew_factor": price_skew, "size_skew_factor": size_skew, 
-                          "tick_multiplier": 1.0 / tick_size, "lot_size": lot_size, "quote_size": max_quote_size})
+        super().__init__(q=inventory, gamma=gamma, kappa=kappa,  tau=tau, sigma=volatility, 
+                         price_skew_factor=price_skew, size_skew_factor=size_skew, 
+                         tick_multiplier=1.0 / tick_size, lot_size=lot_size, quote_size=max_quote_size)
         self.instrument = instr
     
     

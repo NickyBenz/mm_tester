@@ -1,6 +1,6 @@
 from typing import List
 import pandas as pd
-from . import record
+from mmtester import record
 
 
 class Data:

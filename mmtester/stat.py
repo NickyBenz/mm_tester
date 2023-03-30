@@ -3,7 +3,7 @@ import pandas as pd
 import numpy as np
 from typing import List
 from datetime import datetime
-from . import base_instrument
+from mmtester import base_instrument
 
 class Stat:
     def __init__(self, instrument: base_instrument.BaseInstrument, unit='ms'):

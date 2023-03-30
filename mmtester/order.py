@@ -1,5 +1,5 @@
 import pandas as pd
-from . import mm_enums, base_instrument
+from mmtester import mm_enums, base_instrument
 
 
 class Order:

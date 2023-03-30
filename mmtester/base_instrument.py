@@ -1,9 +1,9 @@
 from abc import ABC, abstractmethod
-from . import mm_enums
+from mmtester import mm_enums
 
 
 class BaseInstrument:
-    def ___init__(self, symbol: str, maker_fee: float, taker_fee: float):
+    def __init__(self, symbol: str, maker_fee: float, taker_fee: float):
         self.symbol = symbol
         self.maker_fee = maker_fee
         self.taker_fee = taker_fee
