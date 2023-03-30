@@ -1,8 +1,8 @@
 from typing import List
-from . import base_strategy, mm_enums, exchange, order, position, base_instrument, record, base_quoter
+from . import exchange, mm_enums, exchange, order, position, base_instrument, record, base_quoter
 
 
-class SingleMMStrategy(base_strategy.BaseStrategy):
+class SingleMMStrategy(exchange.BaseStrategy):
     def __init__(self, name: str, quoter: base_quoter.BaseQuoter, balance: float, 
                  instrument: base_instrument.BaseInstrument, 
                  total_time: float, levels: int, quote_frequency: int):
@@ -27,6 +27,7 @@ class SingleMMStrategy(base_strategy.BaseStrategy):
     def on_fill(self, order: order.Order, fill_type: mm_enums.FillType):
         self.position.on_fill(order, fill_type)
         self.requote = True
+    
     
     def on_tick(self, record: record.Record):
         if record.counter > 0 and record.counter  % self.frequency == 0 and self.requote:

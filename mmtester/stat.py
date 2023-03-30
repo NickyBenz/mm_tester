@@ -9,14 +9,14 @@ class Stat:
     def __init__(self, instrument: base_instrument.BaseInstrument, unit='ms'):
         self.intrument: base_instrument.BaseInstrument = instrument
         self.unit: str = unit
-        self.timestamp: List(pd.DatetimeIndex) = []
-        self.mid: List(float) = []
-        self.balance: List(float) = []
-        self.position: List(float) = []
-        self.avg_price: List(float) = []
-        self.fee: List(float) = []
-        self.trade_num: List(int) = []
-        self.trade_qty: List(float) = []
+        self.timestamp: List[pd.DatetimeIndex] = []
+        self.mid: List[float] = []
+        self.balance: List[float] = []
+        self.position: List[float] = []
+        self.avg_price: List[float] = []
+        self.fee: List[float] = []
+        self.trade_num: List[int] = []
+        self.trade_qty: List[float] = []
 
 
     def record(self, timestamp: pd.DatetimeIndex, mid: float, balance: float, position: float, 

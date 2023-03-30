@@ -1,15 +1,38 @@
 import math
 import numpy as np
 import pandas as pd
+from abc import ABC, abstractmethod
 from typing import List, Set, Dict
-from . import mm_enums, data, base_strategy, order, record
+from . import mm_enums, data, exchange, order, record
+
+
+class BaseStrategy(ABC):
+    def __init__(self, name: str):
+        self.name = name
+        self.exchange = None
+    
+    
+    @abstractmethod
+    def on_tick(self, record: record.Record):
+        raise RuntimeError("abstraact method")
+    
+        
+    @abstractmethod 
+    def on_cancel(self, order: order.Order):
+        raise RuntimeError("abstract method")
+    
+    
+    @abstractmethod
+    def on_fill(self, order: order.Order, fill_type: mm_enums.FillType):
+        raise RuntimeError("abstract method")
+    
 
 class Exchange:
     def __init__(self, market_data_latency_ms: float, order_fill_latency_ms: float):
         self.curr_step: int = 0
         self.market_data_latency: float = market_data_latency_ms
         self.order_fill_latency: float = order_fill_latency_ms
-        self.strategies: Set[base_strategy.BaseStrategy] = set()
+        self.strategies: Dict[str, exchange.BaseStrategy] = {}
 
     
     def start(self, dataObject: data.Data):
@@ -21,9 +44,6 @@ class Exchange:
         self.orders: List[order.Order] = []
         self.cancels: Dict[order.Order, pd.DatetimeIndex] = {}
         
-        for strategy in self.strategies:
-            strategy.on_exchange_init(self) 
-    
     
     def get_instruments(self):
         return self.data.get_instrument_names()
@@ -37,18 +57,19 @@ class Exchange:
         for order in self.orders:
             assert(order.state == mm_enums.OrderState.NEW)
             order.state = mm_enums.OrderState.FILLED
-            order.strategy.on_fill(order, mm_enums.FillType.TAKER)
+            self.strategies[order.strategy_name].on_fill(order, mm_enums.FillType.TAKER)
         self.orders.clear()
         
     
     def cancel_order(self, timestamp: pd.DatetimeIndex, order: order.Order):
+        assert(order.strategy_name in self.strategies)
         if order.state == mm_enums.OrderState.NEW:
             self.cancels[order] = timestamp
         
         
-    def cancel_all(self, timestamp: pd.DatetimeIndex, strategy: base_strategy.BaseStrategy):
+    def cancel_all(self, timestamp: pd.DatetimeIndex, strategy_name: str):
         for order in self.orders[:]:
-            if order.strategy == strategy:
+            if order.strategy_name == strategy_name:
                 self.cancels[order] = timestamp
     
         
@@ -60,7 +81,7 @@ class Exchange:
                 if order.state != mm_enums.OrderState.FILLED:
                     order.state = mm_enums.OrderState.CANCELED
                     self.orders.remove(order)
-                    order.strategy.on_cancel(order)
+                    self.strategies[order.strategy_name].on_cancel(order)
 
                 cancelled.append(order)
         
@@ -68,7 +89,7 @@ class Exchange:
             del self.cancels[order]
             
             
-    def add_quotes(self, bids: List[order], asks: List[order]):
+    def add_quotes(self, bids: List[order.Order], asks: List[order.Order]):
         assert(len(bids) == len(asks))
         
         for i in range(len(bids)):
@@ -77,12 +98,14 @@ class Exchange:
         
         
     def add_order(self, order: order.Order):
+        assert(order.strategy_name in self.strategies)
         assert(order.state == mm_enums.OrderState.NEW)
         self.orders.append(order)
     
     
-    def register(self, strategy: base_strategy.BaseStrategy):
-        self.strategies.add(strategy)
+    def register(self, strategy: BaseStrategy):
+        if not strategy.name in self.strategies:
+            self.strategies[strategy.name] = strategy
         
     
     def get_record(self) -> record.Record:
@@ -108,7 +131,7 @@ class Exchange:
                     self.orders.remove(order)
                 elif order.side == mm_enums.Side.SELL and order.price < bid:
                     order.state = mm_enums.OrderState.FILLED
-                    order.strategy.on_fill(order, mm_enums.FillType.MAKER)
+                    self.strategies[order.strategy_name].on_fill(order, mm_enums.FillType.MAKER)
                     self.orders.remove(order)
         
         
