@@ -185,7 +185,7 @@ if __name__ == "__main__":
     generate_snapshot(perpfile, "perp_book.csv")
     generate_snapshot(futurefile, "future_book.csv")
     perp_feat_df = generate_features("perp_book.csv", "perp")
-    fut_price_df = generate_features("future_book.csv", "future")
+    fut_price_df = generate_prices("future_book.csv", "future")
     df = align_dataframes(perp_feat_df, fut_price_df)
     df.to_csv("data.csv", header=0)
     
