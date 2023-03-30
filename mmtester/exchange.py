@@ -25,6 +25,14 @@ class Exchange:
             strategy.on_exchange_init(self) 
     
     
+    def get_instruments(self):
+        return self.data.get_instrument_names()
+    
+    
+    def get_feature_names(self):
+        return self.data.get_feature_names()
+    
+    
     def close_all(self):
         for order in self.orders:
             assert(order.state == mm_enums.OrderState.NEW)
