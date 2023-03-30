@@ -66,14 +66,14 @@ class Stat:
 
     def sharpe(self, resample: str, include_fee: bool=True, trading_days=365) -> float:
         pnl = self.equity(resample, include_fee=include_fee).diff().dropna()
-        c = (24 * 3600) / (pnl.index[-1] - pnl.index[0]).total_seconds
+        c = (24 * 3600) / (pnl.index[1] - pnl.index[0]).total_seconds
         return pnl.mean() / pnl.std() * np.sqrt(c * trading_days)
 
 
     def sortino(self, resample: str, include_fee: bool=True, trading_days=365) -> float:
         pnl = self.equity(resample, include_fee=include_fee).diff().dropna()
         std = pnl[pnl < 0].std()
-        c = (24 * 3600) / (pnl.index[-1] - pnl.index[0]).total_seconds
+        c = (24 * 3600) / (pnl.index[1] - pnl.index[0]).total_seconds
         return pnl.mean() / std * np.sqrt(c * trading_days)
 
 
@@ -134,7 +134,7 @@ class Stat:
         rs_equity = equity.resample(resample).last()
         rs_pnl = rs_equity.diff().dropna()
 
-        c = (24 * 3600) / (rs_pnl.index[-1] - rs_pnl.index[0]).total_seconds
+        c = (24 * 3600) / (rs_pnl.index[1] - rs_pnl.index[0]).total_seconds
         sr = rs_pnl.mean() / rs_pnl.std() * np.sqrt(c * trading_days)
 
         std = rs_pnl[rs_pnl < 0].std()

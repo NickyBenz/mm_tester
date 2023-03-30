@@ -82,7 +82,7 @@ class Exchange:
             return None
         
         step = self.curr_step - self.market_latency_steps
-        return self.dataObject.get_record(step)
+        return self.dataObject.get_record(self.curr_step, step)
 
 
     def fill_orders(self):    

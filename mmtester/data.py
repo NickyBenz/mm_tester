@@ -16,8 +16,8 @@ class Data:
         return self.df.shape[0]
     
     
-    def get_record(self, counter: int) -> record.Record:
-        return record.Record(counter, self.get_index(counter), self.df.iloc[counter, :])
+    def get_record(self, time_counter, fetch_counter: int) -> record.Record:
+        return record.Record(fetch_counter, self.get_index(time_counter), self.df.iloc[fetch_counter, :])
     
     
     def get_index(self, counter: int) -> pd.DatetimeIndex:
