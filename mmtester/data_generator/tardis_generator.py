@@ -16,7 +16,7 @@ def generate_snapshot(input_path, output_path):
         chunk['date'] = pd.to_datetime(chunk['timestamp'], unit='us')
         chunk['td'] = pd.to_timedelta( chunk['timestamp'],'us')
         chunk = chunk.set_index('td')
-        chunk = chunk.resample('150ms').last()
+        chunk = chunk.resample('500ms').last()
         chunk = chunk.reset_index(drop=True)
         chunk = chunk.set_index('date')
         chunk = chunk.drop(['exchange', 'timestamp', 'local_timestamp'], axis=1)
@@ -28,7 +28,7 @@ def bid_ask_imbalance(bid_volumes, ask_volumes, level):
     total_ask_volume = sum(ask_volumes[:level])
     
     imbalance = (total_bid_volume - total_ask_volume) / (total_bid_volume + total_ask_volume)
-    return ("bid_ask_imbalance_{i}".format(i=level), imbalance)
+    return ("feat_bid_ask_imbalance_{i}".format(i=level), imbalance)
 
 
 def weighted_imbalance(bid_prices, bid_volumes, ask_prices, ask_volumes, depth):
@@ -43,7 +43,7 @@ def weighted_imbalance(bid_prices, bid_volumes, ask_prices, ask_volumes, depth):
         weighted_ask_volume += (ask_prices[i] - best_bid) / (best_ask - best_bid) * ask_volumes[i] 
     
     imbalance = (weighted_bid_volume - weighted_ask_volume) / (weighted_bid_volume + weighted_ask_volume)
-    return ("weighted_imbalance_{i}".format(i=depth), imbalance)
+    return ("feat_weighted_imbalance_{i}".format(i=depth), imbalance)
 
 
 def orderbook_slope(bid_prices, bid_volumes, ask_prices, ask_volumes, depth):
@@ -63,7 +63,7 @@ def orderbook_slope(bid_prices, bid_volumes, ask_prices, ask_volumes, depth):
 
     A = np.vstack([prices, np.ones_like(prices)]).T
     slope, _ = np.linalg.lstsq(A, volumes, rcond=None)[0]
-    return ("ob_slope_{i}".format(i=depth), slope)        
+    return ("feat_ob_slope_{i}".format(i=depth), slope)        
 
 
 def depth_weighted_spread(bid_prices, bid_volumes, ask_prices, ask_volumes, depth):
@@ -78,7 +78,7 @@ def depth_weighted_spread(bid_prices, bid_volumes, ask_prices, ask_volumes, dept
         total_volume += avg_volume
     
     depth_weighted_spread = weighted_spreads_sum / total_volume
-    return ("depth_spread_{i}".format(i=depth), depth_weighted_spread)
+    return ("feat_depth_spread_{i}".format(i=depth), depth_weighted_spread)
 
 
 def ewma(data, window):
@@ -138,7 +138,7 @@ def generate_features(filename, name):
         features_df.loc[curr_index, name + "_mid"] = mid_price
         features_df.loc[curr_index, name + "_bid"] = bid_prices[0]
         features_df.loc[curr_index, name + "_ask"] = ask_prices[0]
-        features_df.loc[curr_index, "spread"] = (ask_prices[0] - bid_prices[0])
+        features_df.loc[curr_index, "feat_spread"] = (ask_prices[0] - bid_prices[0])
             
         kv = bid_ask_imbalance(bid_volumes, ask_volumes, 1)
         
@@ -187,7 +187,7 @@ if __name__ == "__main__":
     perp_feat_df = generate_features("perp_book.csv", "perp")
     fut_price_df = generate_prices("future_book.csv", "future")
     df = align_dataframes(perp_feat_df, fut_price_df)
-    df.to_csv("data.csv", header=0)
+    df.to_csv("data.csv", header=True)
     
     
     

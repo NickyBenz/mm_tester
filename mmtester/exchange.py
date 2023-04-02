@@ -38,7 +38,7 @@ class Exchange:
     def start(self, dataObject: data.Data):
         self.dataObject: data.Data = dataObject
         self.sample_frequency: float = dataObject.frequency
-        self.market_latency_steps: int = int(math.ceil(self.market_dataObject_latency / self.sample_frequency))
+        self.market_latency_steps: int = int(math.ceil(self.market_data_latency / self.sample_frequency))
         self.curr_step = 0
         self.max_step: int = dataObject.get_rows() - 1
         self.orders: List[order.Order] = []
@@ -117,7 +117,7 @@ class Exchange:
 
 
     def fill_orders(self):    
-        record = self.dataObject.get_record(self.curr_step)
+        record = self.dataObject.get_record(self.curr_step, self.curr_step)
         
         for order in self.orders[:]:
             assert(order.state == mm_enums.OrderState.NEW)
@@ -139,8 +139,8 @@ class Exchange:
         if self.curr_step >= self.max_step:
             return False
         
-        for strategy in self.strategies:
-            strategy.on_tick(self.get_data())
+        for strategy in self.strategies.values():
+            strategy.on_tick(self.get_record())
         
         self.process_cancels()
         self.fill_orders()
