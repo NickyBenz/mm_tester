@@ -144,20 +144,20 @@ class Stat:
         drawdown = rs_equity - max_equity
         mdd = -drawdown.min()
 
-        ac = (24 * 3600) / (equity.index[-1] - equity.index[0]).value
-        ar = raw_equity[-1] * ac * trading_days
-        rrr = ar / mdd
+        ac = (24 * 3600) / (equity.index[-1] - equity.index[0]).total_seconds()
+        ar = (raw_equity[-1] - raw_equity[0]) / (raw_equity[-1] * ac) * 100
 
         ftn = pd.Series(self.trade_num, index=dt_index).diff().rolling('15Min').sum().mean()
         ftq = pd.Series(self.trade_qty, index=dt_index).diff().rolling('15Min').sum().mean()
 
         capital = self.balance[0]
-        
+        backtest_days = (self.timestamp[-1] - self.timestamp[0]).total_seconds() / (24 * 3600)
         print('=========== Summary ===========')
+        print('backtest days: %.4f' % backtest_days)
+        print('Ending balance: %.2f' % self.balance[-1])
         print('Sharpe ratio: %.1f' % sr)
         print('Sortino ratio: %.1f' % sortino)
-        print('Risk return ratio: %.1f' % rrr)
-        print('Annualised return: %.2f %%' % (ar / capital * 100))
+        print('Daily return: %.2f %%' % (ar / capital * 100))
         print('Max. draw down: %.2f %%' % (mdd / capital * 100))
         print('The number of trades per 15min: %d' % ftn)
         print('Avg. 15 minutes trading volume: %.4f' % ftq)
