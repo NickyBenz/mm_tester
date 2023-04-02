@@ -6,11 +6,11 @@ from mmtester.inverse_instrument import InverseInstrument
 from mmtester.data import Data
 
 if __name__ == '__main__':
-    df = pd.read_csv("./mmtester/data_generator/data/data.csv.gz", header=0, index_col=0, parse_dates=[0]).iloc[:24000]
+    df = pd.read_csv("./mmtester/data_generator/data/data.csv.gz", header=0, index_col=0, parse_dates=[0])
     exch = Exchange(500, 500)
     instr = InverseInstrument("perp", 0, 0.0005)
-    quoter = ASQuoter(instr, 0, 0.1, 2, 1, 0.05, 1.5, 1.5, 0.01, 0.01, 0.5)
-    strategy = SingleMMStrategy("test_strategy", quoter, 2, instr,  3600, 5, 60, df.shape[0])
+    quoter = ASQuoter(instr, 0, 0.1, 2, 1, 0.05, 1.5, 1.5, 0.01, 0.01, 2)
+    strategy = SingleMMStrategy("test_strategy", quoter, 2, instr,  1800, 3, 240, df.shape[0])
     exch.register(strategy)
     exch.start(Data(df, 500))
     
