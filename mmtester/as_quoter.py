@@ -23,9 +23,12 @@ class ASQuoter(base_quoter.BaseQuoter):
         
     def compute(self, timestamp: pd.DatetimeIndex, strategy: exchange.BaseStrategy,
                 reserve_price: float, levels: int, spread: float)-> Tuple[List[order.Order], List[order.Order]]:
-        weights = np.exp(np.linspace(0, 1, levels)) * self.size_skew_factor
+        weights = np.arange(1, levels + 1, 1)
+        weights = np.power(self.size_skew_factor, weights)
         normalized_weights = weights / np.sum(weights)
-        sizes = (self.quote_size * normalized_weights)
+        
+        bid_sizes = (max(self.quote_size * 0.1, 1 - self.q) * normalized_weights)
+        ask_sizes = (max(self.quote_size * 0.1, 1 + self.q) * normalized_weights)
         spreads = np.power(self.price_skew_factor, np.linspace(0, levels-1, levels)) * spread
         bid_prices = np.round((reserve_price - spreads) * self.tick_multiplier) / self.tick_multiplier
         ask_prices = np.round((reserve_price + spreads) * self.tick_multiplier) / self.tick_multiplier
@@ -33,7 +36,7 @@ class ASQuoter(base_quoter.BaseQuoter):
         bids = []
         asks = []
         for i in range(levels):
-            bids.append(order.Order(timestamp, strategy.name, self.instrument, mm_enums.Side.BUY, bid_prices[i], sizes[i]))
-            asks.append(order.Order(timestamp, strategy.name, self.instrument, mm_enums.Side.SELL, ask_prices[i], sizes[i]))
+            bids.append(order.Order(timestamp, strategy.name, self.instrument, mm_enums.Side.BUY, bid_prices[i], bid_sizes[i]))
+            asks.append(order.Order(timestamp, strategy.name, self.instrument, mm_enums.Side.SELL, ask_prices[i], ask_sizes[i]))
         
         return (bids, asks)
