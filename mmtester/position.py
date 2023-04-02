@@ -3,7 +3,7 @@ from mmtester import mm_enums, stat, base_instrument, order, record
 
 
 class Position:
-    def __init__(self, balance: float, instrument: base_instrument.BaseInstrument):
+    def __init__(self, balance: float, instrument: base_instrument.BaseInstrument, length: int):
         self.initial_balance: float = balance
         self.balance: float = balance
         self.instrument: base_instrument.BaseInstrument = instrument
@@ -12,7 +12,7 @@ class Position:
         self.trade_num: int = 0
         self.trade_qty: float = 0
         self.avg_price: float = 0
-        self.stat = stat.Stat(instrument)
+        self.stat = stat.Stat(length, instrument)
     
     
     def on_fill(self, order:order.Order, fill_type: mm_enums.FillType) -> None:

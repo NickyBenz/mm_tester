@@ -7,11 +7,10 @@ from mmtester.data import Data
 
 if __name__ == '__main__':
     df = pd.read_csv("./mmtester/data_generator/data/data.csv", header=0, index_col=0, parse_dates=[0])
-    df = df.iloc[:10000, :]
     exch = Exchange(500, 500)
     instr = InverseInstrument("perp", 0, 0.0005)
-    quoter = ASQuoter(instr, 0, 0.1, 0.5, 1, 0.01, 2, 2, 0.05, 0.01, 1)
-    strategy = SingleMMStrategy("test_strategy", quoter, 2, instr,  df.shape[0], 5, 10)
+    quoter = ASQuoter(instr, 0, 0.1, 0.1, 1, 0.05, 2, 2, 0.05, 0.01, 1)
+    strategy = SingleMMStrategy("test_strategy", quoter, 2, instr,  df.shape[0] * 0.5, 5, 10, df.shape[0])
     exch.register(strategy)
     exch.start(Data(df, 500))
     

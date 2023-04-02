@@ -5,14 +5,14 @@ from mmtester import exchange, mm_enums, exchange, order, position, base_instrum
 class SingleMMStrategy(exchange.BaseStrategy):
     def __init__(self, name: str, quoter: base_quoter.BaseQuoter, balance: float, 
                  instrument: base_instrument.BaseInstrument, 
-                 total_time: float, levels: int, quote_frequency: int):
+                 total_time_in_seconds: float, levels: int, quote_frequency: int, length: int):
         super().__init__(name)
         self.instrument = instrument
         self.quoter: base_quoter.BaseQuoter = quoter
-        self.total_time: float = total_time
+        self.total_time: float = total_time_in_seconds
         self.levels: int = levels
         self.frequency: int = quote_frequency
-        self.position: position.Position = position.Position(balance, instrument)
+        self.position: position.Position = position.Position(balance, instrument, length)
         self.requote: bool = True
 
 

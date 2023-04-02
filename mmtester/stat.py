@@ -6,30 +6,42 @@ from datetime import datetime
 from mmtester import base_instrument
 
 class Stat:
-    def __init__(self, instrument: base_instrument.BaseInstrument, unit='ms'):
+    def __init__(self, length: int, instrument: base_instrument.BaseInstrument, unit='ms'):
         self.instrument: base_instrument.BaseInstrument = instrument
         self.unit: str = unit
-        self.timestamp: List[pd.DatetimeIndex] = []
-        self.mid: List[float] = []
-        self.balance: List[float] = []
-        self.position: List[float] = []
-        self.avg_price: List[float] = []
-        self.fee: List[float] = []
-        self.trade_num: List[int] = []
-        self.trade_qty: List[float] = []
+        self.length = length
+        self.timestamp: List[pd.DatetimeIndex] = [None] * length
+        self.mid: List[float] = [None] * length
+        self.balance: List[float] = [None] * length
+        self.position: List[float] = [None] * length
+        self.avg_price: List[float] = [None] * length
+        self.fee: List[float] = [None] * length
+        self.trade_num: List[int] = [None] * length
+        self.trade_qty: List[float] = [None] * length
+        self.curr_record = 0
 
 
     def record(self, timestamp: pd.DatetimeIndex, mid: float, balance: float, position: float, 
                avg_price: float, fee: float, trade_num: int, trade_qty: float) -> None:
-        self.timestamp.append(timestamp)
-        self.mid.append(mid)
-        self.balance.append(balance)
-        self.position.append(position)
-        self.avg_price.append(avg_price)
-        self.fee.append(fee)
-        self.trade_num.append(trade_num)
-        self.trade_qty.append(trade_qty)
+        self.timestamp[self.curr_record] = timestamp
+        self.mid[self.curr_record] = mid
+        self.balance[self.curr_record] = balance
+        self.position[self.curr_record] = position
+        self.avg_price[self.curr_record] = avg_price
+        self.fee[self.curr_record] = fee
+        self.trade_num[self.curr_record] = trade_num
+        self.trade_qty[self.curr_record] = trade_qty
+        self.curr_record += 1
 
+    def close(self):
+        self.timestamp = self.timestamp[:self.curr_record]
+        self.mid = self.mid[:self.curr_record]
+        self.balance = self.balance[:self.curr_record]
+        self.position = self.position[:self.curr_record]
+        self.avg_price = self.avg_price[:self.curr_record]
+        self.fee = self.fee[:self.curr_record]
+        self.trade_num = self.trade_num[:self.curr_record]
+        self.trade_qty = self.trade_qty[:self.curr_record]
 
     def datetime(self) -> datetime:
         return np.asarray(self.timestamp)
@@ -112,8 +124,9 @@ class Stat:
         else:
             return equity[-1] * c * trading_days / denom
         
-
+    
     def summary(self, resample='5min', trading_days=365):
+        self.close()
         dt_index = self.datetime()
         raw_equity = self.instrument.equity(
             np.asarray(self.mid),
@@ -145,7 +158,7 @@ class Stat:
         mdd = -drawdown.min()
 
         ac = (24 * 3600) / (equity.index[-1] - equity.index[0]).total_seconds()
-        ar = (raw_equity[-1] - raw_equity[0]) / (raw_equity[-1] * ac) * 100
+        ar = (raw_equity[-1] - raw_equity[0]) * 100
 
         ftn = pd.Series(self.trade_num, index=dt_index).diff().rolling('15Min').sum().mean()
         ftq = pd.Series(self.trade_qty, index=dt_index).diff().rolling('15Min').sum().mean()
@@ -159,7 +172,7 @@ class Stat:
         print('Sortino ratio: %.1f' % sortino)
         print('Daily return: %.2f %%' % (ar / capital * 100))
         print('Max. draw down: %.2f %%' % (mdd / capital * 100))
-        print('The number of trades per 15min: %d' % ftn)
+        print('The number of trades per 15min: %.2f' % ftn)
         print('Avg. 15 minutes trading volume: %.4f' % ftq)
 
 
@@ -187,3 +200,4 @@ class Stat:
         position.plot(ax=axs[1])
         axs[1].set_ylabel('Position (Qty)')
         axs[1].grid()
+        fig.savefig("tmp.png")
