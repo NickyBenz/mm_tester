@@ -6,15 +6,20 @@ from mmtester.inverse_instrument import InverseInstrument
 from mmtester.data import Data
 
 if __name__ == '__main__':
+    df = pd.read_csv("./mmtester/data_generator/data/data.csv", header=0, index_col=0, parse_dates=[0])
+    df = df.iloc[:60000, :]
     exch = Exchange(500, 500)
     instr = InverseInstrument("perp", 0, 0.0005)
-    quoter = ASQuoter(instr, 0, 0, 0, 1, 0.1, 2, 2, 0.05, 0.01, 1)
-    strategy = SingleMMStrategy("test_strategy", quoter, 2, instr,  3600, 5, 10)
+    quoter = ASQuoter(instr, 0, 0.1, 0.5, 1, 0.01, 2, 2, 0.05, 0.01, 1)
+    strategy = SingleMMStrategy("test_strategy", quoter, 2, instr,  df.shape[0], 5, 10)
     exch.register(strategy)
-    df = pd.read_csv("data.csv", header=0, index_col=0, parse_dates=[0])
     exch.start(Data(df, 500))
     
+    iter = 0
+    print("total steps=", df.shape[0])
     while exch.step():
-        pass
+        if iter % 500 == 0:
+            print("iter=", iter)
+        iter += 1
     
     strategy.position.stat.summary()

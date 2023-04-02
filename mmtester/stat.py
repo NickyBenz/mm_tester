@@ -7,7 +7,7 @@ from mmtester import base_instrument
 
 class Stat:
     def __init__(self, instrument: base_instrument.BaseInstrument, unit='ms'):
-        self.intrument: base_instrument.BaseInstrument = instrument
+        self.instrument: base_instrument.BaseInstrument = instrument
         self.unit: str = unit
         self.timestamp: List[pd.DatetimeIndex] = []
         self.mid: List[float] = []
@@ -32,7 +32,7 @@ class Stat:
 
 
     def datetime(self) -> datetime:
-        return pd.to_datetime(np.asarray(self.timestamp), unit=self.unit)
+        return np.asarray(self.timestamp)
 
 
     def equity(self, resample: str=None, include_fee: bool=True) -> float:
@@ -66,14 +66,14 @@ class Stat:
 
     def sharpe(self, resample: str, include_fee: bool=True, trading_days=365) -> float:
         pnl = self.equity(resample, include_fee=include_fee).diff().dropna()
-        c = (24 * 3600) / (pnl.index[1] - pnl.index[0]).total_seconds
+        c = (24 * 3600) / (pnl.index[1] - pnl.index[0]).total_seconds()
         return pnl.mean() / pnl.std() * np.sqrt(c * trading_days)
 
 
     def sortino(self, resample: str, include_fee: bool=True, trading_days=365) -> float:
         pnl = self.equity(resample, include_fee=include_fee).diff().dropna()
         std = pnl[pnl < 0].std()
-        c = (24 * 3600) / (pnl.index[1] - pnl.index[0]).total_seconds
+        c = (24 * 3600) / (pnl.index[1] - pnl.index[0]).total_seconds()
         return pnl.mean() / std * np.sqrt(c * trading_days)
 
 
@@ -106,7 +106,7 @@ class Stat:
 
     def annualised_return(self, denom: float=None, include_fee=True, trading_days=365):
         equity = self.equity(None, include_fee=include_fee)
-        c = (24 * 3600) / (equity.index[-1] - equity.index[0]).total_seconds
+        c = (24 * 3600) / (equity.index[-1] - equity.index[0]).total_seconds()
         if denom is None:
             return equity[-1] * c * trading_days
         else:
@@ -134,7 +134,7 @@ class Stat:
         rs_equity = equity.resample(resample).last()
         rs_pnl = rs_equity.diff().dropna()
 
-        c = (24 * 3600) / (rs_pnl.index[1] - rs_pnl.index[0]).total_seconds
+        c = (24 * 3600) / (rs_pnl.index[1] - rs_pnl.index[0]).total_seconds()
         sr = rs_pnl.mean() / rs_pnl.std() * np.sqrt(c * trading_days)
 
         std = rs_pnl[rs_pnl < 0].std()
@@ -160,10 +160,10 @@ class Stat:
         print('Annualised return: %.2f %%' % (ar / capital * 100))
         print('Max. draw down: %.2f %%' % (mdd / capital * 100))
         print('The number of trades per 15min: %d' % ftn)
-        print('Avg. 15 minutes trading volume: %d' % ftq)
+        print('Avg. 15 minutes trading volume: %.4f' % ftq)
 
 
-        position = np.asarray(self.position) * np.asarray(self.mid)
+        position = np.asarray(self.position)
         print('Max leverage: %.2f' % (np.max(np.abs(position)) / capital))
         print('Median leverage: %.2f' % (np.median(np.abs(position)) / capital))
 

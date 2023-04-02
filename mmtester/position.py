@@ -41,7 +41,7 @@ class Position:
         self.trade_qty += abs(qty)
         self.total_qty += qty
         self.balance += pnl
-    
+
     
     def record(self, record: record.Record) -> None:
         price = record.get_instrument_data(self.instrument, "mid")

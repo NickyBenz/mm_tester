@@ -22,6 +22,11 @@ class BaseStrategy(ABC):
         raise RuntimeError("abstract method")
     
     
+    @abstractmethod 
+    def on_exchange_init(self, exch):
+        self.exchange = exch
+        
+    
     @abstractmethod
     def on_fill(self, order: order.Order, fill_type: mm_enums.FillType):
         raise RuntimeError("abstract method")
@@ -44,6 +49,9 @@ class Exchange:
         self.orders: List[order.Order] = []
         self.cancels: Dict[order.Order, pd.DatetimeIndex] = {}
         
+        for strat  in self.strategies.values():
+            strat.on_exchange_init(self)
+                        
     
     def get_instruments(self):
         return self.data.get_instrument_names()
@@ -77,7 +85,7 @@ class Exchange:
         cancelled = []
         
         for order in self.cancels:
-            if self.cancels[order] + self.market_dataObject_latency >= self.df.index[self.curr_step]:
+            if self.df.index[self.curr_step] >= self.cancels[order] + pd.Timedelta(self.market_data_latency, unit="milliseconds"):
                 if order.state != mm_enums.OrderState.FILLED:
                     order.state = mm_enums.OrderState.CANCELED
                     self.orders.remove(order)
@@ -121,13 +129,13 @@ class Exchange:
         
         for order in self.orders[:]:
             assert(order.state == mm_enums.OrderState.NEW)
-            if order.timestamp + pd.Timedelta(self.order_fill_latency, unit="milliseconds") >= record.timestamp:
+            if record.timestamp >= order.timestamp + pd.Timedelta(self.order_fill_latency, unit="milliseconds"):
                 bid = record.get_instrument_data(order.instrument, "bid")
-                ask = record.get_instrument_data(order.intrument, "ask")
+                ask = record.get_instrument_data(order.instrument, "ask")
                 
                 if order.side == mm_enums.Side.BUY and order.price > ask:
                     order.state = mm_enums.OrderState.FILLED
-                    order.strategy.on_fill(order, mm_enums.FillType.MAKER)
+                    self.strategies[order.strategy_name].on_fill(order, mm_enums.FillType.MAKER)
                     self.orders.remove(order)
                 elif order.side == mm_enums.Side.SELL and order.price < bid:
                     order.state = mm_enums.OrderState.FILLED
@@ -137,6 +145,9 @@ class Exchange:
         
     def step(self) -> bool:
         if self.curr_step >= self.max_step:
+            self.close_all()
+            for strat in self.strategies.values():
+                strat.on_tick(self.get_record())
             return False
         
         for strategy in self.strategies.values():

@@ -33,7 +33,9 @@ class SingleMMStrategy(exchange.BaseStrategy):
         if record is not None:
             if record.counter > 0 and record.counter  % self.frequency == 0 and self.requote:
                 self.exchange.cancel_all(record.timestamp, self)
-                (bids, asks) = self.quoter.quote(record.timestamp, self, self.levels, record.get_instrument_data(self.instrument, "mid"))
+                self.quoter.q = self.position.total_qty / self.position.initial_balance
+                (bids, asks) = self.quoter.quote(record.timestamp, self, 
+                                                 record.get_instrument_data(self.instrument, "mid"), self.levels)
                 self.exchange.add_quotes(bids, asks)
                 self.requote = False
             self.position.record(record)
