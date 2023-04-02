@@ -27,8 +27,8 @@ class ASQuoter(base_quoter.BaseQuoter):
         weights = np.power(self.size_skew_factor, weights)
         normalized_weights = weights / np.sum(weights)
         
-        bid_sizes = (max(self.quote_size * 0.1, 1 - self.q) * normalized_weights)
-        ask_sizes = (max(self.quote_size * 0.1, 1 + self.q) * normalized_weights)
+        bid_sizes = (self.quote_size * max(0.1, 1 - self.q) * normalized_weights)
+        ask_sizes = (self.quote_size * max(0.1, 1 + self.q) * normalized_weights)
         spreads = np.power(self.price_skew_factor, np.linspace(0, levels-1, levels)) * spread
         bid_prices = np.round((reserve_price - spreads) * self.tick_multiplier) / self.tick_multiplier
         ask_prices = np.round((reserve_price + spreads) * self.tick_multiplier) / self.tick_multiplier

@@ -8,9 +8,9 @@ from mmtester.data import Data
 if __name__ == '__main__':
     df = pd.read_csv("./mmtester/data_generator/data/data.csv.gz", header=0, index_col=0, parse_dates=[0])
     exch = Exchange(500, 500)
-    instr = InverseInstrument("perp", 0, 0.0005)
-    quoter = ASQuoter(instr, 0, 0.2, 2, 1, 0.02, 2.5, 1.5, 0.01, 0.01, 2)
-    strategy = SingleMMStrategy("test_strategy", quoter, 2, instr, 3600, 5, 1600, df.shape[0])
+    instr = InverseInstrument("perp", 0.000, 0.0005)
+    quoter = ASQuoter(instr, 0, 0.2, 2, 1, 0.02, 2.5, 2.5, 0.01, 0.01, 2)
+    strategy = SingleMMStrategy("test_strategy", quoter, 2, instr, 3600, 2, 1600, df.shape[0])
     exch.register(strategy)
     exch.start(Data(df, 500))
     
