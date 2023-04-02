@@ -10,6 +10,7 @@ class BaseStrategy(ABC):
     def __init__(self, name: str):
         self.name = name
         self.exchange = None
+        self.data_frequency = 0
     
     
     @abstractmethod
@@ -23,8 +24,9 @@ class BaseStrategy(ABC):
     
     
     @abstractmethod 
-    def on_exchange_init(self, exch):
+    def on_exchange_init(self, exch, data_frequency):
         self.exchange = exch
+        self.data_frequency = data_frequency
         
     
     @abstractmethod
@@ -50,7 +52,7 @@ class Exchange:
         self.cancels: Dict[order.Order, pd.DatetimeIndex] = {}
         
         for strat  in self.strategies.values():
-            strat.on_exchange_init(self)
+            strat.on_exchange_init(self, self.dataObject.frequency)
                         
     
     def get_instruments(self):
