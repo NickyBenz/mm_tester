@@ -157,9 +157,7 @@ class Stat:
         drawdown = rs_equity - max_equity
         mdd = -drawdown.min()
 
-        ac = (24 * 3600) / (equity.index[-1] - equity.index[0]).total_seconds()
-        ar = (raw_equity[-1] - raw_equity[0]) * 100
-
+        ar = (raw_equity[-1] - raw_equity[0])
         ftn = pd.Series(self.trade_num, index=dt_index).diff().rolling('15Min').sum().mean()
         ftq = pd.Series(self.trade_qty, index=dt_index).diff().rolling('15Min').sum().mean()
 
@@ -187,8 +185,8 @@ class Stat:
         mid = pd.Series(self.mid, index=dt_index)
 
         ((mid / mid[0] - 1).resample(resample).last() * 100).plot(ax=axs[0], style='grey', alpha=0.5)
-        (rs_equity / capital * 100).plot(ax=axs[0])
-        (rs_equity_wo_fee / capital * 100).plot(ax=axs[0])
+        ((rs_equity / capital - 1.0) * 100).plot(ax=axs[0])
+        ((rs_equity_wo_fee / capital - 1.0) * 100).plot(ax=axs[0])
 
         # axs[0].set_title('Equity')
         axs[0].set_ylabel('Cumulative Returns (%)')

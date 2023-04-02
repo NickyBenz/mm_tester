@@ -16,7 +16,7 @@ class BaseInstrument:
     
     @abstractmethod
     def equity(self, mid: float, balance: float, position: float, avg_price: float, fee: float) -> float:
-        return balance + self.pnl(position, avg_price, mid) + fee
+        return balance + self.pnl(position, avg_price, mid) - fee
         
         
     @abstractmethod

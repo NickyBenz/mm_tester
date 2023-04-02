@@ -63,14 +63,6 @@ class Exchange:
         return self.data.get_feature_names()
     
     
-    def close_all(self):
-        for order in self.orders:
-            assert(order.state == mm_enums.OrderState.NEW)
-            order.state = mm_enums.OrderState.FILLED
-            self.strategies[order.strategy_name].on_fill(order, mm_enums.FillType.TAKER)
-        self.orders.clear()
-        
-    
     def cancel_order(self, timestamp: pd.DatetimeIndex, order: order.Order):
         assert(order.strategy_name in self.strategies)
         if order.state == mm_enums.OrderState.NEW:
@@ -85,9 +77,9 @@ class Exchange:
         
     def process_cancels(self):
         cancelled = []
-        
+        record = self.dataObject.get_record(self.curr_step, self.curr_step)
         for order in self.cancels:
-            if self.df.index[self.curr_step] >= self.cancels[order] + pd.Timedelta(self.market_data_latency, unit="milliseconds"):
+            if record.timestamp >= self.cancels[order] + pd.Timedelta(self.market_data_latency, unit="milliseconds"):
                 if order.state != mm_enums.OrderState.FILLED:
                     order.state = mm_enums.OrderState.CANCELED
                     self.orders.remove(order)
@@ -147,7 +139,6 @@ class Exchange:
         
     def step(self) -> bool:
         if self.curr_step >= self.max_step:
-            self.close_all()
             for strat in self.strategies.values():
                 strat.on_tick(self.get_record())
             return False

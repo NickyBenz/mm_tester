@@ -33,8 +33,8 @@ class SingleMMStrategy(exchange.BaseStrategy):
     def on_tick(self, record: record.Record):
         if record is not None:
             if record.counter > 0 and (record.counter  % self.frequency == 0 or self.requote):
-                self.exchange.cancel_all(record.timestamp, self)
-                self.quoter.q = self.position.total_qty / self.position.initial_balance
+                self.exchange.cancel_all(record.timestamp, self.name)
+                self.quoter.q = self.position.total_qty * 3.0 / self.position.initial_balance
                 self.quoter.tau = (self.curr_step * self.frequency * self.data_frequency) % 3600
                 (bids, asks) = self.quoter.quote(record.timestamp, self, 
                                                  record.get_instrument_data(self.instrument, "mid"), self.levels)
