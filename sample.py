@@ -7,7 +7,7 @@ from mmtester.inverse_instrument import InverseInstrument
 from mmtester.data import Data
 
 if __name__ == '__main__':
-    df = pd.read_csv("./mmtester/data_generator/data/data.csv.gz", header=0, index_col=0, parse_dates=[0]).iloc[:60000]
+    df = pd.read_csv("./mmtester/data_generator/data/data.csv.gz", header=0, index_col=0, parse_dates=[0])
     exch = Exchange(500, 500)
     spot_instr = InverseInstrument("perp", 0.000, 0.0005)
     future_instr = InverseInstrument("perp", 0.000, 0.0005)
@@ -37,7 +37,7 @@ if __name__ == '__main__':
                           lot_size=0.001,
                           max_quote_size=1)
                           
-    strategy = MultiMMStrategy("test_strategy", quoter, 2, 10, spot_instr, future_instr, 360, 200, df.shape[0])
+    strategy = MultiMMStrategy("test_strategy", quoter, 2, 10, spot_instr, future_instr, 3600, 200, df.shape[0])
     exch.register(strategy)
     exch.start(Data(df, 100))
     
