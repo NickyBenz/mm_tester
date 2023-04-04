@@ -37,7 +37,7 @@ if __name__ == '__main__':
                           lot_size=0.001,
                           max_quote_size=5)
                           
-    strategy = MultiMMStrategy("test_strategy", quoter, 2, 1, spot_instr, future_instr, 9000, 200, df.shape[0])
+    strategy = MultiMMStrategy("test_strategy", quoter, 2, 1, spot_instr, future_instr, 36000, 200, df.shape[0])
     exch.register(strategy)
     exch.start(Data(df, 100))
     
