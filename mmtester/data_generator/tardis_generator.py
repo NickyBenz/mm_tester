@@ -109,6 +109,7 @@ def generate_prices(filename, name):
         prices_df.loc[curr_index, name + "_bid"] = bid_price
         prices_df.loc[curr_index, name + "_ask"] = ask_price
         prices_df.loc[curr_index, name + "_mid"] = (bid_price + ask_price) * 0.5
+        prices_df.loc[curr_index, name + "_featdummy"] = (bid_price + ask_price) * 0.5
     return prices_df
 
 def generate_features(filename, name):
@@ -179,15 +180,15 @@ def align_dataframes(primary_df, price_df):
 import sys
 
 if __name__ == "__main__":
-    perpfile = sys.argv[1]
-    futurefile = sys.argv[2]
+    #perpfile = sys.argv[1]
+    #futurefile = sys.argv[2]
     
-    generate_snapshot(perpfile, "perp_book.csv")
-    generate_snapshot(futurefile, "future_book.csv")
-    perp_feat_df = generate_features("perp_book.csv", "perp")
-    fut_price_df = generate_prices("future_book.csv", "future")
-    df = align_dataframes(perp_feat_df, fut_price_df)
+    #generate_snapshot(perpfile, "perp_book.csv")
+    #generate_snapshot(futurefile, "future_book.csv")
+    perp_1 = generate_prices("data/perp_1.csv.gz", "perp")
+    perp_2 = generate_prices("data/perp_2.csv.gz", "perp")
+    perp_3 = generate_prices("data/perp_3.csv.gz", "perp")
+    perp_4 = generate_prices("data/perp_4.csv.gz", "perp")
+    df = pd.concat([perp_1, perp_2, perp_3, perp_4])
+    #df = align_dataframes(perp_feat_df, fut_price_df)
     df.to_csv("data.csv", header=True)
-    
-    
-    

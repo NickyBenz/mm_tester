@@ -92,11 +92,19 @@ class Exchange:
             
             
     def add_quotes(self, bids: List[order.Order], asks: List[order.Order]):
-        assert(len(bids) == len(asks))
+       
+        record = self.get_record()
         
         for i in range(len(bids)):
-            self.add_order(bids[i])
-            self.add_order(asks[i])
+            bid = record.get_instrument_data(bids[i].instrument, "bid")
+            if bids[i].price <= bid and bids[i].quantity > 0:
+                self.add_order(bids[i])
+                
+                
+        for i in range(len(asks)):    
+            ask = record.get_instrument_data(asks[i].instrument, "ask")
+            if asks[i].price >= ask and asks[i].quantity > 0:
+                self.add_order(asks[i])
         
         
     def add_order(self, order: order.Order):

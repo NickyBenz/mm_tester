@@ -125,7 +125,7 @@ class Stat:
             return equity[-1] * c * trading_days / denom
         
     
-    def summary(self, resample='5min', trading_days=365):
+    def summary(self, filename, resample='5min', trading_days=365):
         self.close()
         dt_index = self.datetime()
         raw_equity = self.instrument.equity(
@@ -169,6 +169,7 @@ class Stat:
         print('Sharpe ratio: %.1f' % sr)
         print('Sortino ratio: %.1f' % sortino)
         print('Daily return: %.2f %%' % (ar / capital * 100))
+        print('Total fees: %.4f' % (np.sum(np.diff(self.fee))))
         print('Max. draw down: %.2f %%' % (mdd / capital * 100))
         print('The number of trades per 15min: %.2f' % ftn)
         print('Avg. 15 minutes trading volume: %.4f' % ftq)
@@ -198,4 +199,4 @@ class Stat:
         position.plot(ax=axs[1])
         axs[1].set_ylabel('Position (Qty)')
         axs[1].grid()
-        fig.savefig("tmp.png")
+        fig.savefig(filename + ".png")
