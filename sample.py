@@ -7,8 +7,7 @@ from mmtester.inverse_instrument import InverseInstrument
 from mmtester.data import Data
 
 if __name__ == '__main__':
-    df = pd.read_csv("./mmtester/data_generator/data/data.csv.gz", header=0, index_col=0, parse_dates=[0]).iloc[:60000
-                                                                                                                ]
+    df = pd.read_csv("./mmtester/data_generator/data/data.csv.gz", header=0, index_col=0, parse_dates=[0]).iloc[:160000]
     exch = Exchange(500, 500)
     spot_instr = InverseInstrument("perp", 0.000, 0.0005)
     future_instr = InverseInstrument("future", 0.000, 0.0005)
