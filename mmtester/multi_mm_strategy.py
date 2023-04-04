@@ -16,6 +16,7 @@ class MultiMMStrategy(exchange.BaseStrategy):
         self.spot_position: position.Position = position.Position(spot_balance, self.spot_instr, length)
         self.future_position: position.Position = position.Position(spot_balance, self.future_instr, length)
         self.requote: bool = True
+        self.wait_step = 0
 
 
     def on_cancel(self, order: order.Order):
@@ -38,19 +39,27 @@ class MultiMMStrategy(exchange.BaseStrategy):
     
     def on_tick(self, record: record.Record):
         if record is not None:
-            if record.counter > 0 and (record.counter  % self.frequency == 0 or self.requote):
-                self.exchange.cancel_all(record.timestamp, self.name)
-                self.quoter.future_q = self.future_position.total_qty / (self.future_position.initial_balance * self.max_leverage) + 1
-                self.quoter.spot_q = self.spot_position.total_qty / (self.spot_position.initial_balance * self.max_leverage) - 1
-                self.quoter.tau = (record.counter * self.data_frequency) % (self.total_time * 1000)
-                self.quoter.tau /= (self.total_time * 1000)
-                self.quoter.tau = 1 - self.quoter.tau
+            if record.counter > 0:
+                if self.requote:
+                    self.exchange.cancel_all(record.timestamp, self.name)
+                    self.requote = False
+                    self.wait_step = 0
+                elif record.counter  % self.frequency == 0 or self.wait_step == 100:
+                    self.wait_step = 0
+                    self.exchange.cancel_all(record.timestamp, self.name)
+                    self.quoter.future_q = self.future_position.total_qty / (self.future_position.initial_balance * self.max_leverage) + 1
+                    self.quoter.spot_q = self.spot_position.total_qty / (self.spot_position.initial_balance * self.max_leverage) - 1
+                    self.quoter.tau = (record.counter * self.data_frequency) % (self.total_time * 1000)
+                    self.quoter.tau /= (self.total_time * 1000)
+                    self.quoter.tau = 1 - self.quoter.tau
 
-                (spot_bids, spot_asks, future_bids, future_asks) = self.quoter.quote(record.timestamp, self, 
-                                                                                     record.get_instrument_data(self.spot_instr, "mid"), 
-                                                                                     record.get_instrument_data(self.future_instr, "mid"))
-                self.exchange.add_quotes(spot_bids, spot_asks)
-                self.exchange.add_quotes(future_bids, future_asks)
-                self.requote = False
+                    (spot_bids, spot_asks, future_bids, future_asks) = self.quoter.quote(record.timestamp, self, 
+                                                                                        record.get_instrument_data(self.spot_instr, "mid"), 
+                                                                                        record.get_instrument_data(self.future_instr, "mid"))
+                    self.exchange.add_quotes(spot_bids, spot_asks)
+                    self.exchange.add_quotes(future_bids, future_asks)
+                    self.requote = False
+                else:
+                    self.wait_step += 1
             self.spot_position.record(record)
             self.future_position.record(record)
