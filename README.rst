@@ -20,7 +20,7 @@ backtest days: 4.0000
 Ending balance: 2.17
 Sharpe ratio: 15.1
 Sortino ratio: 21.4
-Daily return: 7.92 %
+Total return: 7.92 %
 Total fees: 0.0000
 Max. draw down: 2.35 %
 The number of trades per 15min: 16.60
@@ -28,13 +28,14 @@ Avg. 15 minutes trading volume: 0.6039
 Max leverage: 1.74
 Median leverage: 0.87
 
+
 =========== Summary ===========
 Instrument: ETH weekly future
 backtest days: 4.0000
 Ending balance: 2.20
 Sharpe ratio: 15.8
 Sortino ratio: 20.0
-Daily return: 11.20 %
+Total return: 11.20 %
 Total fees: -0.0209
 Max. draw down: 3.59 %
 The number of trades per 15min: 16.54
