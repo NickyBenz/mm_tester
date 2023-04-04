@@ -68,10 +68,10 @@ class DualASQuoter():
         future_bid_size_weights /= np.sum(future_bid_size_weights)
         future_ask_size_weights /= np.sum(future_ask_size_weights)
         
-        spot_bid_size_weights *= self.quote_size * max(0.01, 1 - self.spot_q)
-        spot_ask_size_weights *= self.quote_size * max(0.01, 1 + self.spot_q)
-        future_bid_size_weights *= self.quote_size * max(0.01, 1 - self.delta_q)
-        future_ask_size_weights *= self.quote_size * max(0.01, 1 + self.delta_q)
+        spot_bid_size_weights *= self.quote_size * max(0.0001, 1 - self.spot_q)
+        spot_ask_size_weights *= self.quote_size * max(0.0001, 1 + self.spot_q)
+        future_bid_size_weights *= self.quote_size * max(0.0001, 1 - self.delta_q)
+        future_ask_size_weights *= self.quote_size * max(0.0001, 1 + self.delta_q)
         
         spot_bid_spreads = np.power(self.spot_bid_price_skew_factor, np.linspace(0, self.spot_bid_levels-1, self.spot_bid_levels))
         spot_ask_spreads = np.power(self.spot_ask_price_skew_factor, np.linspace(0, self.spot_ask_levels-1, self.spot_ask_levels))
