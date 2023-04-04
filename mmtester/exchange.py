@@ -97,13 +97,19 @@ class Exchange:
         
         for i in range(len(bids)):
             bid = record.get_instrument_data(bids[i].instrument, "bid")
-            if bids[i].price <= bid and bids[i].quantity > 0:
+            if bids[i].price > bid:
+                bids[i].price = bid
+                
+            if bids[i].quantity > 0:
                 self.add_order(bids[i])
                 
                 
         for i in range(len(asks)):    
             ask = record.get_instrument_data(asks[i].instrument, "ask")
-            if asks[i].price >= ask and asks[i].quantity > 0:
+            if asks[i].price < ask:
+                asks[i].price = ask
+            
+            if asks[i].quantity > 0:
                 self.add_order(asks[i])
         
         
@@ -135,11 +141,11 @@ class Exchange:
                 bid = record.get_instrument_data(order.instrument, "bid")
                 ask = record.get_instrument_data(order.instrument, "ask")
                 
-                if order.side == mm_enums.Side.BUY and order.price > ask:
+                if order.side == mm_enums.Side.BUY and order.price >= ask:
                     order.state = mm_enums.OrderState.FILLED
                     self.strategies[order.strategy_name].on_fill(order, mm_enums.FillType.MAKER)
                     self.orders.remove(order)
-                elif order.side == mm_enums.Side.SELL and order.price < bid:
+                elif order.side == mm_enums.Side.SELL and order.price <= bid:
                     order.state = mm_enums.OrderState.FILLED
                     self.strategies[order.strategy_name].on_fill(order, mm_enums.FillType.MAKER)
                     self.orders.remove(order)

@@ -13,12 +13,12 @@ if __name__ == '__main__':
     future_instr = InverseInstrument("future", -0.0001, 0.0005)
     quoter = DualASQuoter(spot_instr=spot_instr,
                           future_instr=future_instr,
-                          delta=0, 
+                          future_q=0, 
                           spot_q=0, 
-                          gamma=0.2, 
-                          kappa=3, 
+                          gamma=0.8, 
+                          kappa=2, 
                           tau=1, 
-                          volatility=0.05,
+                          volatility=0.01,
                           spot_bid_price_skew=2,
                           spot_ask_price_skew=2,
                           spot_bid_size_skew=2,
@@ -35,9 +35,9 @@ if __name__ == '__main__':
                           future_q_skew=1,
                           tick_size=0.05,
                           lot_size=0.001,
-                          max_quote_size=1)
+                          max_quote_size=5)
                           
-    strategy = MultiMMStrategy("test_strategy", quoter, 2, 1, spot_instr, future_instr, 360, 200, df.shape[0])
+    strategy = MultiMMStrategy("test_strategy", quoter, 2, 1, spot_instr, future_instr, 9000, 200, df.shape[0])
     exch.register(strategy)
     exch.start(Data(df, 100))
     
