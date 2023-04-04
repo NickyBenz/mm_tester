@@ -13,8 +13,8 @@ Assumptions:
 2. 500 millisecond network latency to receive market data.
 3. 500 millisecond network latency to submit orders/cancel orders.
 
-
-=========== Summary ===========
+Results
+=======
 Instrument: ETH perpetual swap
 backtest days: 4.0000
 Ending balance: 2.17
@@ -28,8 +28,6 @@ Avg. 15 minutes trading volume: 0.6039
 Max leverage: 1.74
 Median leverage: 0.87
 
-
-=========== Summary ===========
 Instrument: ETH weekly future
 backtest days: 4.0000
 Ending balance: 2.20
@@ -42,4 +40,3 @@ The number of trades per 15min: 16.54
 Avg. 15 minutes trading volume: 0.6016
 Max leverage: 2.21
 Median leverage: 1.10
-
