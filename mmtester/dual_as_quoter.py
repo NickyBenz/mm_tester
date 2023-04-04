@@ -45,8 +45,8 @@ class DualASQuoter():
 
     def quote(self, timestamp: pd.DatetimeIndex, strategy: exchange.BaseStrategy, 
               spot_price: float, future_price: float)-> Tuple[List[order.Order], List[order.Order]]:
-        spot_reserve_price = spot_price - self.spot_q_skew * self.spot_q * self.gamma * (self.sigma**2) * self.tau
-        future_reserve_price = future_price - self.future_q_skew * self.delta_q * self.gamma * (self.sigma**2) * self.tau
+        spot_reserve_price = spot_price + self.spot_q_skew * self.spot_q * self.gamma * (self.sigma**2) * self.tau
+        future_reserve_price = future_price + self.future_q_skew * self.delta_q * self.gamma * (self.sigma**2) * self.tau
         spread = self.gamma * (self.sigma**2) * self.tau + (2.0 / self.gamma) * math.log(1 + self.gamma / self.kappa)
         return self.compute(timestamp, strategy, spot_reserve_price, future_reserve_price, spread)
 
