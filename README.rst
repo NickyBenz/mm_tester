@@ -40,6 +40,7 @@ Max leverage: 1.74
 
 Median leverage: 0.87
 
+.. image:: https://github.com/satyapravin/mm_tester/perp.png?sanitize=true
 
 
 Instrument: ETH weekly future
@@ -66,3 +67,5 @@ Max leverage: 2.21
 
 Median leverage: 1.10
 
+
+.. image:: https://github.com/satyapravin/mm_tester/future.png?sanitize=true
