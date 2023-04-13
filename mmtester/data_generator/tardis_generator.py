@@ -2,7 +2,7 @@ import numpy as np
 import os
 import pandas as pd
 from tqdm import tqdm
-
+from datetime import date, timedelta
 
 def generate_snapshot(input_path, output_path):
     chunksize = 1000 * 1000
@@ -112,6 +112,7 @@ def generate_prices(filename, name):
         prices_df.loc[curr_index, name + "_featdummy"] = (bid_price + ask_price) * 0.5
     return prices_df
 
+
 def generate_features(filename, name):
     book = pd.read_csv(filename, header=0, index_col=['date'], parse_dates=['date'])
     bid_price_cols = []
@@ -178,6 +179,7 @@ def align_dataframes(primary_df, price_df):
     return df
 
 import sys
+import re 
 
 if __name__ == "__main__":
     #perpfile = sys.argv[1]
@@ -185,10 +187,25 @@ if __name__ == "__main__":
     
     #generate_snapshot(perpfile, "perp_book.csv")
     #generate_snapshot(futurefile, "future_book.csv")
-    perp_1 = generate_prices("data/perp_1.csv.gz", "perp")
-    perp_2 = generate_prices("data/perp_2.csv.gz", "perp")
-    perp_3 = generate_prices("data/perp_3.csv.gz", "perp")
-    perp_4 = generate_prices("data/perp_4.csv.gz", "perp")
-    df = pd.concat([perp_1, perp_2, perp_3, perp_4])
-    #df = align_dataframes(perp_feat_df, fut_price_df)
+    perps = []
+    futures = []
+    
+    start = date(2023, 1, 21)
+    end = date(2023, 2, 16)
+    path = "/home/pravin/work/market-making-analysis/python/tardis_data/book_snapshot_25/"
+    
+    while start <= end:
+        file = "deribit_book_snapshot_25_" + start.strftime("%Y-%m-%d")
+        pfiles = [f for f in os.listdir(path + "perp/") if file in f]
+        ffiles = [f for f in os.listdir(path) if file in f]
+        assert(len(pfiles) == 1)
+        assert(len(ffiles) == 1)
+        perp = generate_prices(path + "perp/" + pfiles[0], "perp")
+        future = generate_prices(path + ffiles[0], "future")
+        perps.append(perp)
+        futures.append(future)
+        start += timedelta(days=1)
+    perp_feat_df = pd.concat(perps)
+    future_feat_df = pd.concat(futures)
+    df = align_dataframes(perp_feat_df, future_feat_df)
     df.to_csv("data.csv", header=True)

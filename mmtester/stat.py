@@ -163,22 +163,23 @@ class Stat:
 
         capital = self.balance[0]
         backtest_days = (self.timestamp[-1] - self.timestamp[0]).total_seconds() / (24 * 3600)
-        print('=========== Summary ===========')
+        '''print('=========== Summary ===========')
         print('backtest days: %.4f' % backtest_days)
         print('Ending balance: %.2f' % self.balance[-1])
         print('Sharpe ratio: %.1f' % sr)
         print('Sortino ratio: %.1f' % sortino)
-        print('Daily return: %.2f %%' % (ar / capital * 100))
+        print('Hourly return: %.2f %%' % (ar / capital * 100))
         print('Total fees: %.4f' % (np.sum(np.diff(self.fee))))
         print('Max. draw down: %.2f %%' % (mdd / capital * 100))
         print('The number of trades per 15min: %.2f' % ftn)
-        print('Avg. 15 minutes trading volume: %.4f' % ftq)
+        print('Avg. 15 minutes trading volume: %.4f' % ftq)'''
 
 
-        position = np.asarray(self.position)
-        print('Max leverage: %.2f' % (np.max(np.abs(position)) / capital))
-        print('Median leverage: %.2f' % (np.median(np.abs(position)) / capital))
+        '''position = np.asarray(self.position)
+        #print('Max leverage: %.2f' % (np.max(np.abs(position)) / capital))
+        #print('Median leverage: %.2f' % (np.median(np.abs(position)) / capital))
 
+        
         fig, axs = plt.subplots(2, 1, sharex=True)
         fig.subplots_adjust(hspace=0)
         fig.set_size_inches(10, 6)
@@ -199,4 +200,5 @@ class Stat:
         position.plot(ax=axs[1])
         axs[1].set_ylabel('Position (Qty)')
         axs[1].grid()
-        fig.savefig(filename + ".png")
+        fig.savefig(filename + ".png")'''
+        return backtest_days, self.balance[-1], sr, sortino, (ar/capital*100), np.sum(np.diff(self.fee)), mdd/capital * 100, ftn, ftq

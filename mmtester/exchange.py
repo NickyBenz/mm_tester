@@ -157,8 +157,10 @@ class Exchange:
                 strat.on_tick(self.get_record())
             return False
         
+        record = self.get_record()
+        
         for strategy in self.strategies.values():
-            strategy.on_tick(self.get_record())
+            strategy.on_tick(record)
         
         self.process_cancels()
         self.fill_orders()

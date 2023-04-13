@@ -4,6 +4,8 @@ import pandas as pd
 
 class MultiMMStrategy(exchange.BaseStrategy):
     def __init__(self, name: str, quoter: dual_as_quoter.DualASQuoter, spot_balance: float, max_leverage: float, 
+                 init_spot_position: float, init_spot_avg_price: float,
+                 init_future_position: float, init_future_avg_price: float,
                  spot_instr: base_instrument.BaseInstrument, future_instr: base_instrument.BaseInstrument,
                  total_time_in_seconds: float, quote_frequency: int, length: int):
         super().__init__(name)
@@ -13,8 +15,15 @@ class MultiMMStrategy(exchange.BaseStrategy):
         self.total_time: float = total_time_in_seconds
         self.frequency: int = quote_frequency
         self.max_leverage: float = max_leverage
-        self.spot_position: position.Position = position.Position(spot_balance, self.spot_instr, length)
-        self.future_position: position.Position = position.Position(spot_balance, self.future_instr, length)
+        self.spot_position: position.Position = position.Position(spot_balance, self.spot_instr, 
+                                                                  init_spot_position,
+                                                                  init_spot_avg_price, 
+                                                                  length)
+        
+        self.future_position: position.Position = position.Position(spot_balance, self.future_instr,
+                                                                    init_future_position,
+                                                                    init_future_avg_price,
+                                                                    length)
         self.requote: bool = True
         self.wait_step = 0
 
@@ -44,12 +53,11 @@ class MultiMMStrategy(exchange.BaseStrategy):
                     self.exchange.cancel_all(record.timestamp, self.name)
                     self.requote = False
                     self.wait_step = 0
-                elif record.counter  % self.frequency == 0 or self.wait_step == 100:
+                elif self.wait_step == 300:
                     self.wait_step = 0
-                    self.exchange.cancel_all(record.timestamp, self.name)
-                    self.quoter.future_q = self.future_position.total_qty / (self.future_position.initial_balance * self.max_leverage) + 1
-                    self.quoter.spot_q = self.spot_position.total_qty / (self.spot_position.initial_balance * self.max_leverage) - 1
-                    self.quoter.tau = (record.counter * self.data_frequency) % (self.total_time * 1000)
+                    self.quoter.future_q = self.future_position.total_qty / (self.future_position.initial_balance * self.max_leverage) 
+                    self.quoter.spot_q = self.spot_position.total_qty / (self.spot_position.initial_balance * self.max_leverage) 
+                    self.quoter.tau = (record.counter * self.data_frequency) 
                     self.quoter.tau /= (self.total_time * 1000)
                     self.quoter.tau = 1 - self.quoter.tau
 
@@ -61,5 +69,6 @@ class MultiMMStrategy(exchange.BaseStrategy):
                     self.requote = False
                 else:
                     self.wait_step += 1
+            
             self.spot_position.record(record)
             self.future_position.record(record)

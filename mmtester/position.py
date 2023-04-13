@@ -3,15 +3,16 @@ from mmtester import mm_enums, stat, base_instrument, order, record
 
 
 class Position:
-    def __init__(self, balance: float, instrument: base_instrument.BaseInstrument, length: int):
+    def __init__(self, balance: float, instrument: base_instrument.BaseInstrument,
+                 init_qty: float, init_avg_price: float, length: int):
         self.initial_balance: float = balance
         self.balance: float = balance
         self.instrument: base_instrument.BaseInstrument = instrument
-        self.total_qty: float = 0
+        self.total_qty: float = init_qty
         self.fees: float = 0
         self.trade_num: int = 0
         self.trade_qty: float = 0
-        self.avg_price: float = 0
+        self.avg_price: float = init_avg_price
         self.stat = stat.Stat(length, instrument)
     
     
@@ -28,10 +29,10 @@ class Position:
         else:
             assert(self.avg_price > 0)
             if abs(self.total_qty) == abs(qty):
-                pnl += self.instrument.pnl(order.quantity, self.avg_price, order.price)
+                pnl = self.instrument.pnl(order.quantity, self.avg_price, order.price)
                 self.avg_price = 0
             elif abs(self.total_qty) > abs(qty):
-                pnl += self.instrument.pnl(order.quantity, self.avg_price, order.price)
+                pnl = self.instrument.pnl(order.quantity, self.avg_price, order.price)
             else:
                 pnl = self.instrument.pnl(self.total_qty, self.avg_price, order.price)
                 self.avg_price = order.price
